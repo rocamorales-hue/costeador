@@ -1,5 +1,5 @@
 // REEMPLAZA ESTA URL CON LA QUE COPIASTE DE APPS SCRIPT
-const API_URL = 'https://script.google.com/macros/s/TU_ID_DE_DESPLIEGUE/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxa4JMS_Zihxgja9rPxq1_Za_XWL84SJOyQQafoqDPkJdIl7AuIBgP-wHd0-vrCmb8Z/exec';
 
 document.addEventListener("DOMContentLoaded", () => {
     cargarCostos();
