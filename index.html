@@ -1,90 +1,57 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Costeador</title>
-<style>
-:root{--bg:#faf7f2;--tx:#2b2118;--ac:#6f4e37;--bd:#e0d6ca;--card:#fff}
-@media(prefers-color-scheme:dark){:root{--bg:#1c1713;--tx:#f1e9df;--ac:#c79a6b;--bd:#3a3028;--card:#26201a}}
-body{margin:0;font:15px system-ui,sans-serif;background:var(--bg);color:var(--tx)}
-header{padding:16px 20px;font-size:20px;font-weight:600;color:var(--ac)}
-nav{display:flex;gap:6px;padding:0 20px;flex-wrap:wrap}
-nav button{padding:8px 14px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;cursor:pointer}
-nav button.on{background:var(--ac);color:#fff}
-main{padding:16px 20px}section{display:none}section.on{display:block}
-h3{margin:18px 0 6px}
-.w{overflow-x:auto}
-table{border-collapse:collapse;background:var(--card);min-width:100%}
-th,td{border:1px solid var(--bd);padding:4px 6px;text-align:left;white-space:nowrap}
-th{font-size:12px;color:var(--ac)}
-input{width:100%;min-width:80px;box-sizing:border-box;border:0;background:transparent;color:inherit;padding:4px}
-td.c{font-weight:600;background:rgba(111,78,55,.08)}
-.b{margin:8px 6px 0 0;padding:8px 14px;border-radius:8px;border:1px solid var(--ac);background:var(--ac);color:#fff;cursor:pointer}
-.b.s{background:transparent;color:var(--ac)}
-#msg{padding:0 20px;color:var(--ac);min-height:20px}
-</style></head><body>
-<header>☕ Costeador</header>
-<nav id="nav"></nav><div id="msg"></div><main id="main"></main>
-<script>
-const API='https://script.google.com/macros/s/AKfycbzcy8v1uv4wX1aLw3Eytyzgpd7wTgLywWG-8_F35df-zEJvxYO-naORwt8ZbRrFfPx-2Q/exec', TOKEN='12345';
-const $=n=>+n||0, m=n=>'$'+(+n||0).toFixed(2);
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Costeador - Café Sierra Escondida</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar-brand { font-weight: bold; color: #4e342e !important; }
+        .table-container { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
 
-const S={Cafe:[],Insumos:[],Bebidas:[],Recetas:[]};
-const costoUnit=i=>$(i.Cantidad)?$(i.Precio)/$(i.Cantidad):0;
-const insumo=n=>S.Insumos.find(i=>i.Insumo===n);
+    <!-- Navbar -->
+    <nav class="navbar navbar-light bg-light shadow-sm mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">☕ Café Sierra Escondida | Panel de Costos</a>
+        </div>
+    </nav>
 
-// cols: [clave, etiqueta, tipo]  | calc: columnas calculadas [etiqueta, fn]
-const CFG={
- Cafe:{title:'Café de mi marca',cols:[['Producto','Producto','t'],['Tipo','Tipo (grano/molido)','t'],['CostoKgVerde','Costo café verde /kg','n'],['MermaPct','Merma tostado %','n'],['FleteKg','Flete /kg','n'],['Gramos','Gramos bolsa','n'],['Empaque','Empaque','n'],['Etiqueta','Etiqueta','n'],['Otros','Otros (molienda, caja…)','n'],['MargenPct','Margen deseado %','n']],
-  calc:[['Costo /kg tostado',r=>(1-$(r.MermaPct)/100)>0?$(r.CostoKgVerde)/(1-$(r.MermaPct)/100)+$(r.FleteKg):0],
-        ['Costo por bolsa',r=>costoBolsa(r)],
-        ['Precio sugerido',r=>costoBolsa(r)/(1-$(r.MargenPct)/100||1)]]},
- Insumos:{title:'Insumos',cols:[['Insumo','Insumo','t'],['Unidad','Unidad (g, ml, pza)','t'],['Cantidad','Cantidad presentación','n'],['Precio','Precio presentación','n']],
-  calc:[['Costo por unidad',r=>costoUnit(r)]]},
- Bebidas:{title:'Bebidas (precio de venta)',cols:[['Bebida','Bebida','t'],['PrecioVenta','Precio de venta','n']],
-  calc:[['Costo total',r=>costoBebida(r.Bebida)],['Utilidad',r=>$(r.PrecioVenta)-costoBebida(r.Bebida)],['Costo %',r=>$(r.PrecioVenta)?(costoBebida(r.Bebida)/$(r.PrecioVenta)*100).toFixed(1)+'%':'-']]},
- Recetas:{title:'Receta: insumos por bebida',cols:[['Bebida','Bebida','t','dBeb'],['Insumo','Insumo','t','dIns'],['Cantidad','Cantidad','n']],
-  calc:[['Costo línea',r=>$(r.Cantidad)*costoUnit(insumo(r.Insumo)||{})]]}
-};
-function costoBolsa(r){const kg=(1-$(r.MermaPct)/100)>0?$(r.CostoKgVerde)/(1-$(r.MermaPct)/100)+$(r.FleteKg):0;
- return kg*$(r.Gramos)/1000+$(r.Empaque)+$(r.Etiqueta)+$(r.Otros)}
-function costoBebida(b){return S.Recetas.filter(r=>r.Bebida===b).reduce((a,r)=>a+$(r.Cantidad)*costoUnit(insumo(r.Insumo)||{}),0)}
+    <!-- Contenido Principal -->
+    <div class="container">
+        <div class="table-container">
+            <h4 class="mb-3">Costo Directo por Bebida</h4>
+            
+            <!-- Indicador de carga -->
+            <div id="loader" class="text-center my-4">
+                <div class="spinner-border text-secondary" role="status">
+                    <span class="visually-hidden">Cargando datos...</span>
+                </div>
+                <p class="mt-2 text-muted">Sincronizando con Google Sheets...</p>
+            </div>
 
-const TABS=[['Cafe','☕ Café'],['Insumos','🧴 Insumos'],['Recetas','📋 Recetas'],['Bebidas','🥤 Bebidas']];
-let tab='Cafe';
+            <!-- Tabla de datos (Oculta por defecto hasta que carguen los datos) -->
+            <div class="table-responsive d-none" id="tableWrapper">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Producto</th>
+                            <th class="text-end">Costo Total (MXN)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCostos">
+                        <!-- Las filas se inyectarán aquí con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-function render(){
- const nav=document.getElementById('nav');
- nav.innerHTML=TABS.map(([k,l])=>`<button class="${k===tab?'on':''}" onclick="tab='${k}';render()">${l}</button>`).join('');
- const c=CFG[tab], rows=S[tab];
- let h=`<h3>${c.title}</h3><div class="w"><table><tr>${c.cols.map(x=>`<th>${x[1]}</th>`).join('')}${c.calc.map(x=>`<th>${x[0]}</th>`).join('')}<th></th></tr>`;
- rows.forEach((r,i)=>{
-  h+='<tr>'+c.cols.map(x=>`<td><input ${x[2]==='n'?'type="number" step="any"':''} ${x[3]?`list="${x[3]}"`:''} value="${(r[x[0]]??'').toString().replace(/"/g,'&quot;')}" onchange="S[tab][${i}]['${x[0]}']=this.value;render()"></td>`).join('')
-   +c.calc.map(x=>{const v=x[1](r);return `<td class="c">${typeof v==='number'?m(v):v}</td>`}).join('')
-   +`<td><button class="b s" onclick="S[tab].splice(${i},1);render()">✕</button></td></tr>`});
- h+=`</table></div><button class="b s" onclick="add()">+ Agregar fila</button><button class="b" onclick="save()">💾 Guardar en Sheets</button>`;
- h+=`<datalist id="dBeb">${[...new Set(S.Bebidas.map(b=>b.Bebida))].map(x=>`<option value="${x}">`).join('')}</datalist>`;
- h+=`<datalist id="dIns">${S.Insumos.map(i=>`<option value="${i.Insumo}">`).join('')}</datalist>`;
- document.getElementById('main').innerHTML=h;
-}
-function add(){S[tab].push(Object.fromEntries(CFG[tab].cols.map(x=>[x[0],''])));render()}
-const say=t=>document.getElementById('msg').textContent=t;
-
-async function save(){
- const c=CFG[tab], headers=c.cols.map(x=>x[0]);
- say('Guardando…');
- try{
-  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},
-   body:JSON.stringify({token:TOKEN,sheet:tab,headers,rows:S[tab].map(r=>headers.map(k=>r[k]??''))})});
-  const j=await r.json(); say(j.ok?'✔ Guardado':'Error: '+j.error);
- }catch(e){say('Error al guardar')}
-}
-async function load(){
- say('Cargando…');
- try{
-  for(const k of Object.keys(S)){const r=await fetch(API+'?sheet='+k);S[k]=await r.json()}
-  say('');
- }catch(e){say('No se pudo cargar (revisa la URL del API)')}
- render();
-}
-load();
-</script></body></html>
+    <!-- Script de lógica -->
+    <script src="app.js"></script>
+</body>
+</html>
